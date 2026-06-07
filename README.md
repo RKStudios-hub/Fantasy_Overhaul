@@ -8,7 +8,7 @@
 
 > ## 🚧 About
 
-> **Odyssey - A Minecraft Mod** is an upcoming fantasy adventure mod currently in development. <br>
+> **Fantasy Overhaul - A Minecraft Mod** is an upcoming fantasy adventure mod currently in development. <br>
 > Explore a magical world filled with fantasy creatures, mysterious places, and epic adventures. <br>
 > Planned creatures include: <br>
 > - 🧝 Elves <br>
