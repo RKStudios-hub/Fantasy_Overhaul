@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fantasy Overhaul — Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS — edit these to retheme everything
+═══════════════════════════════════════════ */
+:root {
+  --parchment:      #f7edd5;
+  --parchment2:     #eddfc0;
+  --parchment3:     #e3cfaa;
+  --parchment4:     #d4bc90;
+  --ink:            #1e1608;
+  --ink-mid:        #4a3e28;
+  --ink-faint:      #8a7e68;
+  --red:            #7a1c1c;
+  --red-light:      #a03030;
+  --green:          #2a5c2a;
+  --blue:           #1c3a6e;
+  --border:         #c0a870;
+  --border-dark:    #8a7040;
+  --shadow:         rgba(30,22,8,0.18);
+
+  /* tag colours */
+  --tag-hostile:    #7a1c1c;
+  --tag-neutral:    #7a5c1c;
+  --tag-friendly:   #2a5c2a;
+  --tag-weapon:     #4a1c6e;
+  --tag-food:       #2a5c3a;
+  --tag-misc:       #4a3e28;
+  --tag-furniture:  #5c3a1c;
+  --tag-decoration: #1c3a5c;
+  --tag-functional: #3a1c5c;
+  --tag-done:       #2a5c2a;
+  --tag-wip:        #7a5c1c;
+  --tag-soon:       #4a3e28;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--parchment2);
+  color: var(--ink);
+  font-family: 'IM Fell English', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: url("https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/cursor.png"), auto;
+}
+
+/* parchment grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(93deg, transparent 0, transparent 4px, rgba(140,110,60,0.04) 4px, rgba(140,110,60,0.04) 5px),
+    repeating-linear-gradient(180deg, transparent 0, transparent 32px, rgba(140,110,60,0.05) 32px, rgba(140,110,60,0.05) 33px);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── outer frame ── */
+.frame {
+  max-width: 1020px;
+  margin: 24px auto;
+  padding: 0 20px 60px;
+  position: relative; z-index: 1;
+}
+
+/* corner ornament SVGs injected via pseudo + background — we'll use real inline SVGs instead */
+.frame-inner {
+  border: 2px solid var(--border-dark);
+  outline: 4px solid var(--border);
+  outline-offset: 6px;
+  box-shadow: 0 8px 48px var(--shadow), inset 0 0 80px rgba(200,160,80,0.08);
+}
+
+/* ── decorative top/bottom band ── */
+.band {
+  height: 10px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--red) 0, var(--red) 8px,
+      var(--border-dark) 8px, var(--border-dark) 10px,
+      var(--parchment3) 10px, var(--parchment3) 14px,
+      var(--border-dark) 14px, var(--border-dark) 16px,
+      var(--red) 16px, var(--red) 24px,
+      transparent 24px, transparent 28px
+    );
+}
+
+/* ── hero ── */
+.hero {
+  text-align: center;
+  padding: 56px 32px 44px;
+  background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment2) 100%);
+  position: relative;
+}
+
+.hero-seal {
+  width: 128px; height: 128px;
+  margin: 0 auto 16px;
+  opacity: 0;
+  animation: fadeUp .7s ease forwards .05s;
+}
+
+.hero-kicker {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .68rem;
+  letter-spacing: .4em;
+  color: var(--red);
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: fadeUp .7s ease forwards .15s;
+}
+
+.hero-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  color: var(--ink);
+  line-height: 1;
+  text-shadow: 2px 3px 0 rgba(200,160,80,0.3), 4px 6px 12px rgba(30,22,8,0.2);
+  opacity: 0;
+  animation: fadeUp .7s ease forwards .25s;
+}
+
+.hero-divider {
+  display: flex; align-items: center; gap: 14px;
+  max-width: 460px; margin: 18px auto 16px;
+  opacity: 0; animation: fadeUp .7s ease forwards .35s;
+}
+.hero-divider::before, .hero-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-dark));
+}
+.hero-divider::after { background: linear-gradient(90deg, var(--border-dark), transparent); }
+
+.hero-sub {
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-mid);
+  letter-spacing: .04em;
+  opacity: 0;
+  animation: fadeUp .7s ease forwards .45s;
+}
+
+/* ── nav bar ── */
+.nav {
+  display: flex;
+  background: var(--parchment3);
+  border-top: 2px solid var(--border-dark);
+  border-bottom: 2px solid var(--border-dark);
+  opacity: 0;
+  animation: fadeUp .6s ease forwards .55s;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--ink-mid);
+  font-family: 'IM Fell English SC', serif;
+  font-size: .8rem;
+  letter-spacing: .1em;
+  padding: 14px 8px;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.nav-btn:last-child { border-right: none; }
+.nav-btn svg { flex-shrink: 0; }
+.nav-btn:hover { background: rgba(122,28,28,.07); color: var(--red); }
+.nav-btn.active {
+  background: var(--parchment);
+  color: var(--red);
+  box-shadow: inset 0 -3px 0 var(--red);
+  font-weight: bold;
+}
+
+/* ── main content ── */
+.main {
+  background: var(--parchment);
+  padding: 48px 40px 56px;
+  min-height: 400px;
+}
+
+/* ── section ── */
+.section { display: none; }
+.section.active { display: block; animation: fadeUp .4s ease; }
+
+.section-heading {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 2.2rem;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 1px 2px 4px rgba(30,22,8,.15);
+}
+
+.section-rule {
+  display: flex; align-items: center; gap: 12px;
+  max-width: 520px; margin: 0 auto 40px;
+}
+.section-rule::before, .section-rule::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-dark);
+}
+
+/* ── card grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 28px;
+}
+
+/* ── card ── */
+.card {
+  background: var(--parchment2);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: transform .25s, box-shadow .25s;
+}
+/* corner ticks */
+.card::before, .card::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  border-color: var(--border-dark);
+  border-style: solid;
+}
+.card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.card::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 10px 32px var(--shadow);
+}
+
+.card-img-wrap {
+  background: var(--parchment3);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px;
+  aspect-ratio: 1/1;
+  position: relative;
+  overflow: hidden;
+}
+/* subtle vignette on image area */
+.card-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  box-shadow: inset 0 0 40px rgba(30,22,8,.12);
+  pointer-events: none;
+}
+
+.card-img {
+  max-width: 250px; max-height: 250px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 4px 8px rgba(30,22,8,.3));
+  position: relative; z-index: 1;
+}
+
+.card-body { padding: 16px 18px 18px; }
+
+.card-name {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 1rem;
+  color: var(--ink);
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+
+.card-desc {
+  font-style: italic;
+  font-size: .88rem;
+  color: var(--ink-mid);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'IM Fell English SC', serif;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  padding: 3px 9px;
+  border: 1px solid;
+  border-radius: 1px;
+}
+
+/* tag colour map */
+.tag-hostile    { color: var(--tag-hostile);    border-color: var(--tag-hostile);    background: rgba(122,28,28,.07); }
+.tag-neutral    { color: var(--tag-neutral);    border-color: var(--tag-neutral);    background: rgba(122,92,28,.07); }
+.tag-friendly   { color: var(--tag-friendly);   border-color: var(--tag-friendly);   background: rgba(42,92,42,.07);  }
+.tag-weapon     { color: var(--tag-weapon);     border-color: var(--tag-weapon);     background: rgba(74,28,110,.07); }
+.tag-food       { color: var(--tag-food);       border-color: var(--tag-food);       background: rgba(42,92,58,.07);  }
+.tag-misc       { color: var(--tag-misc);       border-color: var(--tag-misc);       background: rgba(74,62,40,.07);  }
+.tag-furniture  { color: var(--tag-furniture);  border-color: var(--tag-furniture);  background: rgba(92,58,28,.07);  }
+.tag-decoration { color: var(--tag-decoration); border-color: var(--tag-decoration); background: rgba(28,58,92,.07);  }
+.tag-functional { color: var(--tag-functional); border-color: var(--tag-functional); background: rgba(58,28,92,.07);  }
+.tag-done       { color: var(--tag-done);       border-color: var(--tag-done);       background: rgba(42,92,42,.07);  }
+.tag-wip        { color: var(--tag-wip);        border-color: var(--tag-wip);        background: rgba(122,92,28,.07); }
+.tag-soon       { color: var(--tag-soon);       border-color: var(--border);         background: transparent;         }
+
+/* ── coming soon ── */
+.coming-soon {
+  text-align: center;
+  padding: 72px 24px;
+}
+.coming-soon svg { opacity: .3; margin-bottom: 18px; }
+.coming-soon p {
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-faint);
+  letter-spacing: .04em;
+}
+
+/* ── footer ── */
+footer {
+  text-align: center;
+  background: var(--parchment3);
+  border-top: 2px solid var(--border-dark);
+  padding: 20px 24px;
+  font-style: italic;
+  font-size: .82rem;
+  color: var(--ink-faint);
+  letter-spacing: .05em;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── mobile nav ── */
+@media (max-width: 540px) {
+  .nav { flex-direction: column; }
+  .nav-btn {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    justify-content: flex-start;
+    padding: 13px 20px;
+    white-space: normal;
+  }
+  .nav-btn:last-child { border-bottom: none; }
+  .nav-btn.active { box-shadow: inset 4px 0 0 var(--red); }
+  .main { padding: 32px 20px 40px; }
+}
+</style>
+</head>
+<body>
+<div class="frame">
+<div class="frame-inner">
+
+<!-- ══ BAND ══ -->
+<div class="band"></div>
+
+<!-- ══ HERO ══ -->
+<header class="hero">
+
+  <img class="hero-seal" src="https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Logo_w-BG.png" alt="Fantasy Overhaul Logo"/>
+
+  <p class="hero-kicker">Minecraft Mod · Development Progress</p>
+  <h1 class="hero-title">Fantasy Overhaul</h1>
+  <div class="hero-divider">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1 L10.5 7 L17 9 L10.5 11 L9 17 L7.5 11 L1 9 L7.5 7 Z" fill="#7a1c1c" opacity=".7"/></svg>
+  </div>
+  <p class="hero-sub">A chronicle of realms ancient, magic deep &amp; wonders yet to come</p>
+</header>
+
+<!-- ══ NAV ══ -->
+<nav class="nav" id="main-nav">
+  <!-- buttons injected by JS -->
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main" id="main-content">
+  <!-- sections injected by JS -->
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer>Fantasy Overhaul &ensp;·&ensp; Work in Progress &ensp;·&ensp; All models subject to change</footer>
+
+<div class="band"></div>
+</div><!-- /frame-inner -->
+</div><!-- /frame -->
+
+<script>
+/* ════════════════════════════════════════════════════════
+   SVG ICON LIBRARY
+   To add an icon: add a key and return an <svg> string.
+════════════════════════════════════════════════════════ */
+const ICONS = {
+  mobs: `<i class="fa-solid fa-dragon"></i>`,
+  items: `<i class="fa-solid fa-gem"></i>`,
+  blocks: `<i class="fa-solid fa-cube"></i>`,
+  structures: `<i class="fa-solid fa-landmark"></i>`,
+  hostile: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 L6 3.5 L9 4 L7 6 L7.5 9 L5 7.5 L2.5 9 L3 6 L1 4 L4 3.5 Z" fill="currentColor"/></svg>`,
+  neutral: `<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="3" y1="5" x2="7" y2="5" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  friendly: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8.5 Q2 6 2 4 A3 3 0 0 1 8 4 Q8 6 5 8.5Z" fill="currentColor"/></svg>`,
+  weapon: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M7 1 L9 3 L4 8 L2 9 L3 7 Z" stroke="currentColor" stroke-width="1" fill="none"/><path d="M1 9 L3 7" stroke="currentColor" stroke-width="1"/></svg>`,
+  food: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2 Q7 2 7 5 Q7 8 5 8 Q3 8 3 5 Q3 2 5 2Z" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 2 Q6 1 7 1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>`,
+  misc: `<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="1.5" fill="currentColor"/><circle cx="2" cy="2" r="1" fill="currentColor"/><circle cx="8" cy="2" r="1" fill="currentColor"/><circle cx="2" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>`,
+  furniture: `<svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="5" width="8" height="3" stroke="currentColor" stroke-width="1" fill="none"/><line x1="2" y1="8" x2="2" y2="10" stroke="currentColor" stroke-width="1"/><line x1="8" y1="8" x2="8" y2="10" stroke="currentColor" stroke-width="1"/><rect x="3" y="3" width="4" height="2" stroke="currentColor" stroke-width="1" fill="none"/></svg>`,
+  decoration:`<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 L6 4 L9 4 L6.5 6 L7.5 9 L5 7 L2.5 9 L3.5 6 L1 4 L4 4 Z" stroke="currentColor" stroke-width=".8" fill="none"/></svg>`,
+  functional:`<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 2 L5 1M5 9 L5 8M2 5 L1 5M9 5 L8 5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>`,
+  done: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5 L4 7.5 L8 2.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  wip:  `<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1" fill="none" stroke-dasharray="2 1.5"/></svg>`,
+  soon: `<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2 L5 5 L7 7" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1" fill="none"/></svg>`,
+};
+
+/* ════════════════════════════════════════════════════════
+   DATA — edit this to add/remove entries
+   
+   tag options:
+     mobs     → "hostile" | "neutral" | "friendly"
+     items    → "weapon"  | "food"    | "misc"
+     blocks   → "furniture" | "decoration" | "functional"
+   status     → "done" | "wip" | "soon"
+════════════════════════════════════════════════════════ */
+const DATA = {
+  mobs: [
+    {
+      name: "High Elves",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/lucy.png",
+      desc: "Guardians of ancient forests and forgotten magic.",
+      tags: ["friendly", "misc"],
+      status: "done"
+    },
+    {
+      name: "Mountain Dwarves",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Dwarf.png",
+      desc: "Masters of stone, steel, and legendary craftsmanship.",
+      tags: ["neutral", "misc"],
+      status: "done"
+    },
+    {
+      name: "Pixies",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Pixie_1.png",
+      desc: "Tiny spirits who bless worthy adventurers.",
+      tags: ["friendly", "misc"],
+      status: "done"
+    },
+    {
+      name: "Goblins",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/goblin_1.png",
+      desc: "Mischievous raiders lurking beyond the wilds.",
+      tags: ["hostile", "misc"],
+      status: "done"
+    }
+  ],
+  items: [
+    {
+      name: "Arcane Crystal",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/magical_crystal.png",
+      desc: "A crystal overflowing with mana.",
+      tags: ["misc", "misc"],
+      status: "wip"
+    },
+    {
+      name: "Iron Sword",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/sword.png",
+      desc: "The trusted blade of a novice adventurer.",
+      tags: ["weapon", "misc"],
+      status: "done"
+    },
+    {
+      name: "Warding Skull",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/skull.png",
+      desc: "A grim charm said to repel dark spirits.",
+      tags: ["misc", "misc"],
+      status: "done"
+    },
+    {
+      name: "Dwarven Ale Mug",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Wooden_mug_empty.png",
+      desc: "Favored by dwarves across the realm.",
+      tags: ["misc", "misc"],
+      status: "done"
+    }
+  ],
+  blocks: [
+    {
+      name: "Arcane Workbench",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/magic_Table.png",
+      desc: "Strengthens nearby magical artifacts.",
+      tags: ["functional", "misc", "furniture"],
+      status: "wip"
+    },
+    {
+      name: "Adventurer's Armchair",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/sofa_chair.png",
+      desc: "A brief rest restores body and spirit.",
+      tags: ["functional", "furniture"],
+      status: "wip"
+    },
+    {
+      name: "Brewer's Barrel",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/beer_barrel.png",
+      desc: "Turns humble fruits into fine ale.",
+      tags: ["functional", "misc"],
+      status: "wip"
+    },
+    {
+      name: "Traveler's Wardrobe",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Cabinet.png",
+      desc: "A sturdy storage for worldly possessions.",
+      tags: ["functional", "furniture"],
+      status: "wip"
+    },
+    {
+      name: "Filled Bookshelf",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Shelf_Filled.png",
+      desc: "Knowledge gathered from distant lands.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Empty Bookshelf",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Shelf.png",
+      desc: "Awaiting stories yet to be written.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Wooden Chair",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/chair.png",
+      desc: "Simple comfort for weary travelers.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Wooden Table",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/table.png",
+      desc: "A gathering place for heroes and merchants.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Supply Crate",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/crate.png",
+      desc: "Packed with goods for the next journey.",
+      tags: ["decoration", "misc"],
+      status: "done"
+    },
+    {
+      name: "Village Bench",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Bench.png",
+      desc: "A quiet place to watch the world pass by.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Writing Desk",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Desk.png",
+      desc: "Where maps and quests are prepared.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Tavern Counter",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Counter_table_1.png",
+      desc: "The heart of every bustling tavern.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Merchant Counter",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Counter_table_2.png",
+      desc: "A stall for trade and negotiation.",
+      tags: ["decoration", "furniture"],
+      status: "done"
+    },
+    {
+      name: "Ale Bottles",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/bottle_bunch.png",
+      desc: "A collection of drinks from distant realms.",
+      tags: ["decoration", "misc"],
+      status: "done"
+    },
+    {
+      name: "Glass Bottles",
+      img: "https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/bottles_1.png",
+      desc: "Useful for potions and alchemical brews.",
+      tags: ["decoration", "misc"],
+      status: "done"
+    }
+  ],
+  structures: [
+    /* ── add structures below ──
+    {
+      name: "Elven Outpost",
+      img: "https://...",
+      desc: "A slender watchtower of pale stone rising above the canopy.",
+      tags: [],
+      status: "soon"
+    },
+    */
+  ],
+};
+
+/* ════════════════════════════════════════════════════════
+   NAV CONFIG — edit labels/icons here
+════════════════════════════════════════════════════════ */
+const TABS = [
+  { id: "mobs",       label: "Mobs",       icon: "mobs"       },
+  { id: "items",      label: "Items",      icon: "items"      },
+  { id: "blocks",     label: "Blocks",     icon: "blocks"     },
+  { id: "structures", label: "Structures", icon: "structures" },
+];
+
+/* ════════════════════════════════════════════════════════
+   COMING SOON ICONS per section
+════════════════════════════════════════════════════════ */
+const COMING_ICONS = {
+  mobs:       `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M12 6h24v15a12 12 0 0 1-24 0V6z" stroke="#8a7040" stroke-width="1.5"/><circle cx="17" cy="16" r="2" fill="#8a7040"/><circle cx="31" cy="16" r="2" fill="#8a7040"/><path d="M18 22 Q24 27 30 22" stroke="#8a7040" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M15 36 L10 46M33 36 L38 46" stroke="#8a7040" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  items:      `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M30 6 L42 18 L18 42 L6 30 Z" stroke="#8a7040" stroke-width="1.5"/><path d="M21 9 L12 3 L3 12 L9 21" stroke="#8a7040" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="27" y1="15" x2="15" y2="27" stroke="#8a7040" stroke-width="1" opacity=".5"/></svg>`,
+  blocks:     `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M24 6 L42 16.5 L42 31.5 L24 42 L6 31.5 L6 16.5 Z" stroke="#8a7040" stroke-width="1.5"/><path d="M24 6 L24 42M6 16.5 L42 16.5" stroke="#8a7040" stroke-width="1" opacity=".4"/></svg>`,
+  structures: `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="3" y="24" width="42" height="21" stroke="#8a7040" stroke-width="1.5"/><path d="M3 24 L24 6 L45 24" stroke="#8a7040" stroke-width="1.5"/><rect x="18" y="30" width="12" height="15" stroke="#8a7040" stroke-width="1.2"/><rect x="6" y="30" width="7.5" height="7.5" stroke="#8a7040" stroke-width="1"/><rect x="34.5" y="30" width="7.5" height="7.5" stroke="#8a7040" stroke-width="1"/></svg>`,
+};
+
+/* ════════════════════════════════════════════════════════
+   RENDERER — no need to edit below unless customising layout
+════════════════════════════════════════════════════════ */
+function buildTag(t) {
+  return `<span class="tag tag-${t}">${ICONS[t] || ''}${t.charAt(0).toUpperCase()+t.slice(1)}</span>`;
+}
+
+function buildCard(entry) {
+  const tags = [...(entry.tags||[]), entry.status].map(buildTag).join('');
+  const img  = entry.img
+    ? `<div class="card-img-wrap"><img class="card-img" src="${entry.img}" alt="${entry.name}" loading="lazy"/></div>`
+    : '';
+  return `
+    <div class="card">
+      ${img}
+      <div class="card-body">
+        <div class="card-name">${entry.name}</div>
+        <div class="card-desc">${entry.desc||''}</div>
+        <div class="card-tags">${tags}</div>
+      </div>
+    </div>`;
+}
+
+function buildSection(id) {
+  const entries = DATA[id] || [];
+  const label   = TABS.find(t => t.id === id)?.label || id;
+  const inner   = entries.length
+    ? `<div class="grid">${entries.map(buildCard).join('')}</div>`
+    : `<div class="coming-soon">${COMING_ICONS[id]||''}<p>${label} are yet to be chronicled…</p></div>`;
+  return `
+    <section class="section" id="sec-${id}">
+      <h2 class="section-heading">${label}</h2>
+      <div class="section-rule">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2 L9.5 6.5 L14 8 L9.5 9.5 L8 14 L6.5 9.5 L2 8 L6.5 6.5 Z" fill="#7a1c1c" opacity=".6"/></svg>
+      </div>
+      ${inner}
+    </section>`;
+}
+
+function buildNav() {
+  return TABS.map(t => `
+    <button class="nav-btn" data-target="${t.id}" onclick="showTab('${t.id}',this)">
+      ${ICONS[t.icon]||''} ${t.label}
+    </button>`).join('');
+}
+
+// mount
+document.getElementById('main-nav').innerHTML     = buildNav();
+document.getElementById('main-content').innerHTML = TABS.map(t => buildSection(t.id)).join('');
+
+// activate first tab
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  (btn || document.querySelector(`[data-target="${id}"]`)).classList.add('active');
+}
+showTab(TABS[0].id);
+</script>
+</body>
+</html>
