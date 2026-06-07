@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img width="200" height="200" alt="Odyssey Banner" src="https://github.com/RKStudios-hub/pixelart-assets/blob/main/od.png" />
+  <img width="200" height="200" alt="Odyssey Banner" src="https://raw.githubusercontent.com/RKStudios-hub/Fantasy_Overhaul/main/Assets/Logo.png" />
 </h1>
 
 <h2 align="center">
